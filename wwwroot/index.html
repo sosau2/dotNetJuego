@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tap Arena</title>
+    <style>
+        :root {
+            --bg1: #09111f;
+            --bg2: #101d35;
+            --panel: rgba(12, 17, 31, 0.88);
+            --panel2: rgba(255,255,255,0.04);
+            --blue: #3bb3ff;
+            --blue2: #0a7cff;
+            --pink: #ff4d8d;
+            --gold: #ffd166;
+            --green: #2ae59b;
+            --red: #ff4d5a;
+            --text: #edf6ff;
+            --shadow: rgba(0,0,0,0.4);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(59,179,255,0.3), transparent 35%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+            color: var(--text);
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            padding: 16px;
+        }
+
+        .game {
+            width: min(92vw, 700px);
+            background: var(--panel);
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px var(--shadow);
+            padding: 24px 20px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--pink), #ff7c59);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-weight: 800;
+            box-shadow: 0 8px 20px rgba(255, 77, 141, 0.35);
+        }
+
+        .tag.secondary {
+            background: linear-gradient(135deg, var(--blue), #6ad1ff);
+            box-shadow: 0 8px 20px rgba(59, 179, 255, 0.35);
+        }
+
+        .title {
+            margin: 0;
+            font-size: clamp(2rem, 6vw, 3rem);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-align: center;
+            color: var(--text);
+            text-shadow: 0 0 16px rgba(255,255,255,0.2);
+        }
+
+        .panel {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin: 20px 0;
+        }
+
+        .box {
+            background: var(--panel2);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 16px 14px;
+            text-align: center;
+        }
+
+        .label {
+            color: rgba(237,246,255,0.72);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 0.72rem;
+            margin-bottom: 8px;
+        }
+
+        .value {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .timer {
+            color: var(--gold);
+        }
+
+        .score {
+            color: var(--green);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0 20px;
+        }
+
+        .input {
+            flex: 1 1 180px;
+            max-width: 240px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input::placeholder {
+            color: rgba(237,246,255,0.52);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            color: var(--text);
+            transition: transform 0.12s ease, filter 0.12s ease;
+        }
+
+        .btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), var(--blue2));
+            box-shadow: 0 12px 22px rgba(10,124,255,0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red), #ff7d6a);
+            box-shadow: 0 12px 22px rgba(255, 77, 90, 0.3);
+        }
+
+        .tap-zone {
+            position: relative;
+            width: min(62vw, 240px);
+            height: min(62vw, 240px);
+            margin: 20px auto 10px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: radial-gradient(circle at 30% 30%, #7fe1ff, #1aa9ff 25%, #0f54d9 62%, #102c74 100%);
+            box-shadow:
+                0 18px 30px rgba(11, 58, 160, 0.55),
+                inset 0 10px 22px rgba(255,255,255,0.22),
+                inset 0 -14px 18px rgba(0,0,0,0.26);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            z-index: 1;
+        }
+
+        .tap-zone:hover {
+            transform: translateY(-2px);
+        }
+
+        .tap-zone:active {
+            transform: scale(0.96);
+        }
+
+        .tap-core {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 10px;
+        }
+
+        .tap-emoji {
+            font-size: 3rem;
+            filter: drop-shadow(0 4px 10px rgba(255,255,255,0.3));
+        }
+
+        .tap-text {
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .mensaje {
+            min-height: 24px;
+            text-align: center;
+            font-weight: 600;
+            color: rgba(237,246,255,0.86);
+            margin: 12px 0 18px;
+        }
+
+        .puntajes {
+            margin-top: 18px;
+        }
+
+        .puntajes h3 {
+            margin: 0 0 12px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(237,246,255,0.8);
+        }
+
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .tabla th, .tabla td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-align: left;
+        }
+
+        .tabla th {
+            color: rgba(237,246,255,0.72);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.7rem;
+        }
+
+        .tabla td {
+            color: var(--text);
+        }
+
+        .tabla tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(42, 229, 155, 0.15);
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .floating-plus {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 9999;
+            pointer-events: none;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 209, 102, 0.9), 0 0 16px rgba(59,179,255,0.9);
+            animation: subir 0.8s ease-out forwards;
+        }
+
+        @keyframes subir {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 0) scale(0.7);
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -90px) scale(1.4);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .panel {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                letter-spacing: 0.07em;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .input {
+                max-width: none;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game">
+        <div class="header">
+            
+            <span class="tag secondary">Tap Arena</span>
+        </div>
+
+        <h1 class="title">Tap Counter</h1>
+
+        <div class="panel">
+            <div class="box">
+                <div class="label">Tiempo</div>
+                <div class="value timer" id="tiempo">10.0s</div>
+            </div>
+            <div class="box">
+                <div class="label">Puntaje</div>
+                <div class="value score" id="puntaje">0</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input id="usuario" class="input" type="text" maxlength="30" placeholder="Tu nombre" value="Jugador">
+            <button id="iniciar" class="btn btn-primary" type="button">Iniciar</button>
+            <button id="reiniciar" class="btn btn-danger" type="button">Reset</button>
+        </div>
+
+        <button id="tapButton" class="tap-zone" type="button" aria-label="Tap">
+            <span class="tap-core">
+                <span class="tap-emoji">✦</span>
+                <span class="tap-text">Tap!</span>
+            </span>
+        </button>
+
+        <div id="mensaje" class="mensaje">Presiona iniciar para empezar.</div>
+
+        <div class="puntajes">
+            <h3>Top puntajes</h3>
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Jugador</th>
+                        <th>Puntos</th>
+                    </tr>
+                </thead>
+                <tbody id="listaPuntajes">
+                    <tr>
+                        <td colspan="3">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const tiempoEl = document.getElementById("tiempo");
+    const puntajeEl = document.getElementById("puntaje");
+    const mensajeEl = document.getElementById("mensaje");
+    const tapButton = document.getElementById("tapButton");
+    const iniciarBtn = document.getElementById("iniciar");
+    const reiniciarBtn = document.getElementById("reiniciar");
+    const listaPuntajes = document.getElementById("listaPuntajes");
+    const usuarioInput = document.getElementById("usuario");
+
+    const TIEMPO_MAX = 10;
+    let tiempoRestante = TIEMPO_MAX;
+    let puntaje = 0;
+    let juegoActivo = false;
+    let timer = null;
+
+    function actualizarTiempo() {
+        tiempoEl.textContent = `${tiempoRestante.toFixed(1)}s`;
+    }
+
+    function actualizarPuntaje() {
+        puntajeEl.textContent = puntaje;
+    }
+
+    function mostrarMensaje(texto) {
+        mensajeEl.textContent = texto;
+    }
+
+    function resetJuego() {
+        clearInterval(timer);
+        timer = null;
+        tiempoRestante = TIEMPO_MAX;
+        puntaje = 0;
+        juegoActivo = false;
+        actualizarTiempo();
+        actualizarPuntaje();
+        mostrarMensaje("Presiona iniciar para empezar.");
+    }
+
+    function finalizarJuego() {
+        clearInterval(timer);
+        timer = null;
+        juegoActivo = false;
+
+        const nombre = (usuarioInput.value || "Jugador").trim() || "Jugador";
+        mostrarMensaje(`Tiempo terminado. ${nombre} hizo ${puntaje} puntos.`);
+        guardarPuntaje(nombre, puntaje);
+    }
+
+    function iniciarJuego() {
+        if (juegoActivo) return;
+
+        const nombre = (usuarioInput.value || "Jugador").trim() || "Jugador";
+        usuarioInput.value = nombre;
+
+        puntaje = 0;
+        tiempoRestante = TIEMPO_MAX;
+        juegoActivo = true;
+
+        actualizarPuntaje();
+        actualizarTiempo();
+        mostrarMensaje(`¡Juego en marcha! ${nombre}, tappea lo más rápido posible.`);
+
+        timer = setInterval(() => {
+            tiempoRestante = Math.max(0, tiempoRestante - 0.1);
+
+            if (tiempoRestante <= 0) {
+                finalizarJuego();
+                return;
+            }
+
+            actualizarTiempo();
+        }, 100);
+    }
+
+    tapButton.addEventListener("click", () => {
+        if (!juegoActivo) {
+            mostrarMensaje("Primero inicia el juego.");
+            return;
+        }
+
+        puntaje += 1;
+        actualizarPuntaje();
+    });
+
+    iniciarBtn.addEventListener("click", iniciarJuego);
+    reiniciarBtn.addEventListener("click", resetJuego);
+
+    async function guardarPuntaje(jugador, puntos) {
+        try {
+            const respuesta = await fetch("/api/Puntaje", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    jugador: jugador,
+                    puntos: puntos
+                })
+            });
+
+            if (!respuesta.ok) {
+                throw new Error("Error " + respuesta.status);
+            }
+
+            await cargarPuntajes();
+        } catch (error) {
+            console.error(error);
+            mostrarMensaje("No se pudo guardar el puntaje.");
+        }
+    }
+
+    async function cargarPuntajes() {
+        try {
+            const response = await fetch("/api/Puntaje");
+            if (!response.ok) {
+                throw new Error("Error " + response.status);
+            }
+
+            const data = await response.json();
+            const puntajes = Array.isArray(data) ? data : [];
+
+            puntajes.sort((a, b) => {
+                const pa = Number(a.puntos ?? a.Puntos ?? 0);
+                const pb = Number(b.puntos ?? b.Puntos ?? 0);
+                return pb - pa;
+            });
+
+            if (puntajes.length === 0) {
+                listaPuntajes.innerHTML = `
+                    <tr>
+                        <td colspan="3">No hay puntajes todavía.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            listaPuntajes.innerHTML = puntajes
+                .slice(0, 10)
+                .map((item, index) => {
+                    const nombre = item.jugador ?? item.Jugador ?? `Jugador ${index + 1}`;
+                    const puntos = Number(item.puntos ?? item.Puntos ?? 0);
+
+                    return `
+                        <tr>
+                            <td><span class="badge">#${index + 1}</span></td>
+                            <td>${nombre}</td>
+                            <td>${puntos}</td>
+                        </tr>
+                    `;
+                })
+                .join("");
+        } catch (error) {
+            console.error(error);
+            listaPuntajes.innerHTML = `
+                <tr>
+                    <td colspan="3">No se pudieron cargar los puntajes.</td>
+                </tr>
+            `;
+        }
+    }
+
+    actualizarTiempo();
+    actualizarPuntaje();
+    cargarPuntajes();
+</script>
+</body>
+</html>
